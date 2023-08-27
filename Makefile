@@ -8,6 +8,7 @@ BINARY = $(addprefix $(BUILDDIR)/,$(PROJECTNAME))
 HEADERDIR := $(SOURCEDIR)/
 BINARYSOURCES := $(shell find . -type f -name "*.cpp" -not -path "./**/$(PROJECTNAME)**/*.cpp")
 TESTSSOURCE := $(shell find . -type f -path "./**/$(PROJECTNAME)-tests/*.cpp")
+LIBS =
 
 NULLPIPE =
 
@@ -76,7 +77,7 @@ main: mac_clean help
 build: init $(BINARY)
 
 $(BINARY): $(BINARYSOURCES) lib$(PROJECTNAME).a
-	$(CXX) $(CFLAGS) $(BINARYSOURCES) -I$(HEADERDIR) -L$(BUILDDIR) -l$(PROJECTNAME) -o $@
+	$(CXX) $(CFLAGS) $(LIBS) $(BINARYSOURCES) -I$(HEADERDIR) -L$(BUILDDIR) -l$(PROJECTNAME) -o $@
 
 $(OBJECTS): $(SOURCES)
 	$(foreach SOURCE,$(SOURCES),`$(CXX) $(CFLAGS) -fPIE -I$(HEADERDIR) -c $(SOURCE) -o $(addprefix $(BUILDDIR)/,$(shell basename $(SOURCE:%.cpp=%.o)))`)

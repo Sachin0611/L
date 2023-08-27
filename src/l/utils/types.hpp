@@ -1,6 +1,11 @@
 #pragma once
 
+#if !defined(L_INCLUDED) && !defined(L_PRIVATE_INCLUDE)
+#error L header file included directly, Include l/l.hpp. 
+#endif // !defined(L_INCLUDED) && !defined(L_PRIVATE_INCLUDE)
+
 #include <cinttypes>
+#include <cstddef>
 #include <cfloat>
 
 typedef int8_t  i8;

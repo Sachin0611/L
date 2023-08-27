@@ -4,4 +4,6 @@
 #error L header file included directly, Include l/l.hpp. 
 #endif // !defined(L_INCLUDED) && !defined(L_PRIVATE_INCLUDE)
 
-#include "parser.hpp"
+#define MAJOR 0
+#define MINOR 0
+#define PATCH 2

@@ -1,12 +1,10 @@
-#include <l/expression/expression.hpp>
+#include <l/l.hpp>
 #include <iostream>
-
-#include "utils.hpp"
 
 int main(int argc, char** argv) {
     UNUSED(argc) UNUSED(argv)
 
-    LExpression<bigf> expr = LExpression<bigf>("-((1 + 2)(2 + 3)^2)");
+    LExpression<bigf> expr = LExpression<bigf>("pi");
 
     std::cout << "Eval: " << expr.evaluate() << "\n";
     return 0;

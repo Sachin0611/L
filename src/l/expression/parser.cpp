@@ -1,28 +1,25 @@
 #include <string>
 
+#define L_PRIVATE_INCLUDE
 #include "parser.hpp"
 #include "../utils/utils.hpp"
 #include "../math/math.hpp"
+#include "tables.hpp"
 
-static const std::unordered_map<char, i8> precedence = {
-    {'+', 1},
-    {'-', 1},
-    {'*', 2},
-    {'/', 2},
-    {'^', 3},
-};
+L_PRIVATE inline bool is_function(std::string x) {
+    for (auto function: functions)
+        if (function.second == x) return true;
 
-template<typename T>
-static const std::unordered_map<char, T(*)(T, T)> operator_functions {
-    {'+', &LMath::add<T>},
-    {'-', &LMath::sub<T>}, 
-    {'*', &LMath::mul<T>},
-    {'/', &LMath::div<T>},
-    {'^', &LMath::pow<T>},
-};
+    return false;
+}
 
 L_PRIVATE inline bool is_operator(char op) {
     return precedence.contains(op);
+}
+
+template <typename T>
+L_PRIVATE inline bool is_constant(std::string op) {
+    return constants<T>.contains(op);
 }
 
 template <typename T>
@@ -31,11 +28,31 @@ LExpression<T>::LExpression(const std::string& expr) {
     size_t index = 0;
 
     while (index < expr.length()) {
-        if (std::isspace(expr[index])) {
+        char token = expr[index];
+
+        if (std::isspace(token)) {
             index++; continue;
         }
 
-        char token = expr[index];
+        if (std::isalpha(token)) {
+            std::string buffer;
+
+            while (std::isalpha(expr[index]))
+                buffer += expr[index++];
+
+            if (is_function(buffer)) {
+                operator_stack.push(buffer[0]);
+                continue;
+            }
+
+            else if (is_constant<T>(buffer)) {
+                value_stack.push(constants<T>.at(buffer));
+                continue;
+            }
+            
+            else
+                throw std::runtime_error("Invalid function: " + buffer);
+        }
 
         if (std::isdigit(token) || (token == '-' && (index == 0 || !std::isdigit(expr[index - 1])))) {
             if (expr.size() > index + 1 && is_operator(expr[index + 1]))
@@ -56,7 +73,6 @@ LExpression<T>::LExpression(const std::string& expr) {
                 int nop = 0;
 
                 while (true) {
-                    printf("index: %zu | nop: %d | expr[index]: %c\n", index, nop, expr[index]);
                     if (expr[index] == '(')
                         nop++;
 
@@ -133,54 +149,8 @@ LExpression<T>::LExpression(const std::string& expr) {
         }
         
         else
-            throw std::runtime_error("Invalid charachter in expression");
+            throw std::runtime_error("Invalid charachter in expression: '" + std::string(1, token) + "'");
     }
-}
-
-template <typename T>
-void LExpression<T>::evaluate_top_operator() {
-    char op = operator_stack.top();
-    operator_stack.pop();
-
-    printf("op: %c\n", op);
-    
-    if (op == '-' && value_stack.size() >= 1) {
-        T operand = value_stack.top();
-        value_stack.pop();
-        value_stack.push(-operand); // Applying the negative sign
-        return;
-    }
-    
-    if (value_stack.size() < 2) {
-        // Handle error, insufficient operands
-        return;
-    }
-    
-    T b = value_stack.top();
-    value_stack.pop();
-    T a = value_stack.top();
-    value_stack.pop();
-    
-    T result = operator_functions<T>.at(op)(a, b);
-    value_stack.push(result);
-}
-
-template <typename T>
-T LExpression<T>::evaluate() {
-    while (!operator_stack.empty())
-        evaluate_top_operator();
-
-    while (!value_stack.empty()) {
-        if (value_stack.size() == 1)
-            break;
-
-        value_stack.pop();
-    }
-
-    // if (value_stack.size() != 1)
-    //     throw std::runtime_error("Invalid expression");
-
-    return value_stack.top();
 }
 
 template class LExpression<f32>;
