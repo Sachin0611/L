@@ -1,7 +1,8 @@
 #pragma once
-
+#include <cmath>
 #include <string>
 #include <cstdio>
+
 
 #include "../utils/utils.hpp"
 

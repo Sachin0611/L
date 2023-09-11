@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cmath>
 #include <string>
 
 #define L_PRIVATE_INCLUDE
@@ -14,12 +16,12 @@ L_PRIVATE inline bool is_function(std::string x) {
 }
 
 L_PRIVATE inline bool is_operator(char op) {
-    return precedence.contains(op);
+    return precedence.count(op) > 0;
 }
 
 template <typename T>
 L_PRIVATE inline bool is_constant(std::string op) {
-    return constants<T>.contains(op);
+    return constants<T>.count(op) > 0;
 }
 
 template <typename T>
@@ -101,6 +103,7 @@ LExpression<T>::LExpression(const std::string& expr) {
 
                 continue;
             }
+            
             
             T value = LMath::floating_from_string<T>(expr.substr(index));
 
