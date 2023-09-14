@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cmath>
 #define L_PRIVATE_INCLUDE
 #include "parser.hpp"
 #include "../utils/utils.hpp"
